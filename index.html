@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoBaguio | Smart Waste Management</title>
+    <link rel="stylesheet" href="index.css">
+
+    <!-- Page-Specific Styling -->
+    <style>
+        /* Hero Image Styling */
+        .hero {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 40px;
+            padding: 60px 10%;
+            background: linear-gradient(120deg, #14532d, #3c8b55);
+            color: white;
+            flex-wrap: wrap;
+        }
+
+        .hero-content {
+            max-width: 600px;
+            text-align: left;
+        }
+
+        .hero h1 {
+            font-size: 42px;
+            margin-bottom: 20px;
+            line-height: 1.2;
+        }
+
+        .hero p {
+            margin-bottom: 30px;
+            font-size: 16px;
+        }
+
+        #logo1 {
+            width: 100%;
+            max-width: 450px;
+            height: auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+        }
+
+        /* How It Works Section */
+        .how-it-works, .gallery {
+            padding: 60px 10%;
+            text-align: center;
+            background: #f4f8f4;
+        }
+
+        .how-it-works h2, .gallery h2 {
+            font-size: 32px;
+            color: #14532d;
+            margin-bottom: 10px;
+        }
+
+        .how-it-works > p, .gallery > p {
+            color: #666;
+            margin-bottom: 40px;
+        }
+
+        .steps-container {
+            display: flex;
+            justify-content: center;
+            align-items: stretch;
+            gap: 25px;
+            flex-wrap: wrap;
+        }
+
+        .step-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            width: 300px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: transform 0.3s;
+        }
+
+        .step-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .step-card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .step-card h3 {
+            color: #166534;
+            margin-bottom: 10px;
+        }
+
+        .step-card p {
+            color: #555;
+            font-size: 14px;
+        }
+
+        /* Gallery Section */
+        .gallery {
+            background: #e4f1e6;
+        }
+
+        .gallery-container {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 25px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .gallery-item {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            text-align: left;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        .gallery-item img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 15px;
+        }
+
+        .gallery-item h3 {
+            color: #166534;
+            margin-bottom: 8px;
+        }
+
+        .gallery-item p {
+            color: #555;
+            font-size: 14px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 900px) {
+            .hero {
+                flex-direction: column;
+                text-align: center;
+            }
+            .hero-content {
+                text-align: center;
+            }
+        }
+
+        @media (max-width: 700px) {
+            .gallery-container {
+                grid-template-columns: 1fr;
+            }
+            .step-card {
+                width: 100%;
+                max-width: 400px;
+            }
+            .hero h1 {
+                font-size: 32px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Navigation -->
+    <header>
+        <nav class="navbar">
+            <h2>🌱 EcoBaguio</h2>
+
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="#about">About</a></li>
+                <li><a href="report.html">Report Waste</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero" id="home">
+
+        <div class="hero-content">
+            <h1>A Cleaner Baguio Through Smarter Waste Management</h1>
+
+            <p>
+                Help build a cleaner and greener Baguio City.
+                Report waste problems, promote proper segregation,
+                and protect our environment.
+            </p>
+
+            <a href="report.html" class="btn">
+                Report a Waste Problem
+            </a>
+        </div>
+
+        <img src="image/baguio-philippines (1).jpg"
+             id="logo1"
+             alt="Burnham Park in Baguio City">
+    </section>
+
+    <!-- About Section -->
+    <section class="about" id="about">
+        <h2>About EcoBaguio</h2>
+
+        <p>
+            EcoBaguio is a community-based digital platform designed
+            to improve waste management and promote environmental
+            awareness in Baguio City. It provides residents with an
+            accessible way to report improper waste disposal,
+            overflowing garbage bins, illegal dumping, and other
+            environmental concerns within their communities.
+
+            <br><br>
+
+            Through its reporting system, residents can submit
+            waste-related complaints, provide descriptions, and
+            pinpoint the exact location of reported problems using
+            an interactive map. This helps make environmental
+            concerns easier to identify, monitor, and address.
+
+            <br><br>
+
+            EcoBaguio also promotes proper waste segregation,
+            responsible waste disposal, and active community
+            participation. By connecting residents with a
+            centralized reporting and monitoring platform, the
+            project aims to encourage cooperation between
+            communities and local waste management authorities.
+
+            <br><br>
+
+            Our goal is to help create a cleaner, greener, and
+            healthier Baguio City through technology, community
+            involvement, and environmental responsibility.
+        </p>
+    </section>
+
+    <!-- Goals Section -->
+    <section class="features">
+        <h2>Our Goals</h2>
+
+        <div class="feature-container">
+
+            <div class="feature-card">
+                <h3>♻️ Proper Waste Segregation</h3>
+                <p>
+                    Encourage residents to separate biodegradable,
+                    recyclable, and residual waste.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <h3>📍 Waste Reporting</h3>
+                <p>
+                    Allow residents to report illegal dumping and
+                    overflowing garbage bins.
+                </p>
+            </div>
+
+            <div class="feature-card">
+                <h3>🌿 Environmental Protection</h3>
+                <p>
+                    Help protect Baguio's rivers, waterways,
+                    communities, and surroundings.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- How It Works Section -->
+    <section class="how-it-works">
+
+        <h2>How EcoBaguio Works</h2>
+
+        <p>
+            Help keep Baguio clean through these simple steps.
+        </p>
+
+        <div class="steps-container">
+
+            <div class="step-card">
+                <img src="image/2d63bd81-c818-4985-8c32-80e9bf47c66d.png"
+                     alt="Baguio City environment">
+
+                <h3>1. Submit a Report</h3>
+
+                <p>
+                    Report waste problems in your community
+                    and provide their exact location.
+                </p>
+            </div>
+
+            <div class="step-card">
+                <img src="image/9fd08fe0-7c6c-46df-9c53-672677ee92ee.png"
+                     alt="Community cleanup">
+
+                <h3>2. Review the Report</h3>
+
+                <p>
+                    Submitted reports can be reviewed
+                    and monitored by administrators.
+                </p>
+            </div>
+
+            <div class="step-card">
+                <img src="image/066107e2-e7f8-4f5c-b70a-bd56792bd096.png"
+                     alt="Waste collection">
+
+                <h3>3. Take Action</h3>
+
+                <p>
+                    Help promote cleaner surroundings
+                    through community action.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Environmental Gallery -->
+    <section class="gallery">
+
+        <h2>Our Environment, Our Responsibility</h2>
+
+        <p>
+            Let's work together to keep Baguio City clean and green.
+        </p>
+
+        <div class="gallery-container">
+
+            <div class="gallery-item">
+                <img src="image/image4.png"
+                     alt="Proper waste segregation">
+
+                <h3>Proper Waste Segregation</h3>
+
+                <p>
+                    Separate biodegradable, recyclable,
+                    and residual waste.
+                </p>
+            </div>
+
+            <div class="gallery-item">
+                <img src="image/image5.png"
+                     alt="Recycling activities">
+
+                <h3>Recycling Matters</h3>
+
+                <p>
+                    Reuse materials and reduce
+                    unnecessary waste.
+                </p>
+            </div>
+
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer>
+        <p>
+            © 2026 EcoBaguio |
+            A Cleaner Baguio Through Smarter Waste Management
+        </p>
+    </footer>
+
+</body>
+</html>

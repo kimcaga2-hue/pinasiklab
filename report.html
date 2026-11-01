@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoBaguio | Report Waste</title>
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- MapLibre -->
+    <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.20/leaflet-maplibre-gl.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+        :root {
+            --primary: #166534;
+            --primary-dark: #14532d;
+            --primary-light: #dcfce7;
+            --background: #f5f8f5;
+            --surface: #ffffff;
+            --text: #1e293b;
+            --muted: #64748b;
+            --border: #e5e7eb;
+            --accent: #84cc16;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background: var(--background);
+            color: var(--text);
+            line-height: 1.7;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* NAVBAR */
+
+        .navbar {
+            background: #14532d;
+            color: #d8e2dc;
+            min-height: 80px;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 8%;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+            box-shadow: 0 3px 15px rgba(0, 0, 0, 0.12);
+            transition: 0.3s ease;
+        }
+
+        .navbar h2 {
+            font-size: 30px;
+            color: #d8e2dc;
+            transition: 0.3s ease;
+        }
+
+        .navbar h2:hover {
+            color: #facc15;
+            transform: scale(1.04);
+        }
+
+        .navbar ul {
+            display: flex;
+            align-items: center;
+            list-style: none;
+            gap: 35px;
+        }
+
+        .navbar a {
+            color: #d8e2dc;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: bold;
+            transition: 0.3s ease;
+            position: relative;
+        }
+
+        .navbar a::after {
+            content: "";
+            position: absolute;
+            width: 0;
+            height: 2px;
+            left: 0;
+            bottom: -6px;
+            background: #facc15;
+            transition: width 0.3s ease;
+        }
+
+        .navbar a:hover {
+            color: #facc15;
+        }
+
+        .navbar a:hover::after {
+            width: 100%;
+        }
+
+        /* REPORT SECTION */
+
+        .report-section {
+            padding: 125px 5% 60px;
+            flex: 1;
+            background:
+                radial-gradient(circle at 10% 10%, #dcfce7 0, transparent 35%),
+                radial-gradient(circle at 90% 90%, #e0f2e5 0, transparent 35%),
+                var(--background);
+            animation: fadeUp .7s ease both;
+        }
+
+        .report-section h2 {
+            font-size: 40px;
+            font-weight: 800;
+            color: var(--primary-dark);
+            margin-bottom: 8px;
+            letter-spacing: -1px;
+            text-align: center;
+        }
+
+        .report-section > p {
+            color: var(--muted);
+            font-size: 17px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        /* FORM */
+
+        form {
+            max-width: 850px;
+            width: 100%;
+            margin: 30px auto;
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: left;
+            box-shadow: 0 15px 45px rgba(15,60,30,.08);
+            border: 1px solid #e5eee6;
+            animation: formEnter .8s ease both;
+        }
+
+        form label {
+            display: block;
+            margin-top: 22px;
+            margin-bottom: 8px;
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary-dark);
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 15px 16px;
+            margin-top: 5px;
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            font-size: 16px;
+            color: var(--text);
+            background: #fafcfb;
+            outline: none;
+            transition: .25s;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(22,101,52,.09);
+        }
+
+        input::placeholder,
+        textarea::placeholder {
+            color: #94a3b8;
+        }
+
+        textarea {
+            height: 150px;
+            resize: vertical;
+        }
+
+        /* FILE UPLOAD */
+
+        input[type="file"] {
+            padding: 12px;
+            background: #f8fafc;
+            border: 1px dashed var(--primary);
+            cursor: pointer;
+        }
+
+        #imagePreview {
+            display: none;
+            width: 100%;
+            max-height: 300px;
+            object-fit: cover;
+            margin-top: 15px;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+
+        /* MAP */
+
+        #map {
+            height: 450px;
+            width: 100%;
+            margin-top: 15px;
+            border-radius: 15px;
+            border: 1px solid var(--border);
+            overflow: hidden;
+            z-index: 1;
+            box-shadow: 0 5px 18px rgba(0,0,0,.08);
+            transition: .3s;
+        }
+
+        #map:hover {
+            box-shadow: 0 8px 25px rgba(0,0,0,.15);
+        }
+
+        /* SUBMIT BUTTON */
+
+        .btn {
+            display: inline-block;
+            background: linear-gradient(120deg, #166534, #15803d);
+            color: white;
+            padding: 16px 24px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 17px;
+            cursor: pointer;
+            transition: .3s;
+            text-decoration: none;
+        }
+
+        .btn:hover {
+            background: linear-gradient(120deg, #14532d, #166534);
+            transform: translateY(-3px);
+            box-shadow: 0 9px 22px rgba(22,101,52,.2);
+        }
+
+        .btn:active {
+            transform: scale(.98);
+        }
+
+        form button {
+            width: 100%;
+            margin-top: 30px;
+        }
+
+        /* SUCCESS MESSAGE */
+
+        #message {
+            font-weight: 700;
+            margin: 15px auto;
+            font-size: 16px;
+            max-width: 850px;
+            min-height: 22px;
+            text-align: center;
+            animation: fadeUp .3s ease;
+        }
+
+        /* FOOTER */
+
+        footer {
+            background: #14532d;
+            color: white;
+            padding: 25px;
+            text-align: center;
+            margin-top: auto;
+            font-size: 15px;
+        }
+
+        /* ANIMATIONS */
+
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes formEnter {
+            from {
+                opacity: 0;
+                transform: translateY(30px) scale(.98);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* RESPONSIVE */
+
+        @media(max-width: 700px) {
+            .navbar {
+                flex-direction: column;
+                text-align: center;
+                padding: 15px 4%;
+                gap: 10px;
+            }
+
+            .navbar ul {
+                justify-content: center;
+                gap: 15px;
+                flex-wrap: wrap;
+            }
+
+            .navbar h2 {
+                font-size: 25px;
+            }
+
+            .navbar a {
+                font-size: 14px;
+            }
+
+            .report-section {
+                padding: 140px 4% 35px;
+            }
+
+            .report-section h2 {
+                font-size: 30px;
+            }
+
+            .report-section > p {
+                font-size: 15px;
+            }
+
+            form {
+                padding: 25px 20px;
+                border-radius: 15px;
+            }
+
+            form label {
+                font-size: 15px;
+            }
+
+            input,
+            select,
+            textarea {
+                font-size: 15px;
+            }
+
+            #map {
+                height: 320px;
+            }
+
+            .btn {
+                font-size: 16px;
+            }
+        }
+
+        /* ACCESSIBILITY */
+
+        @media(prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: .01ms !important;
+                animation-iteration-count: 1 !important;
+                transition-duration: .01ms !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <nav class="navbar">
+            <h2>🌱 EcoBaguio</h2>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="report.html">Report Waste</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="report-section">
+        <h2>Report a Waste Problem</h2>
+        <p>Help us identify areas that need attention.</p>
+
+        <form id="reportForm" onsubmit="return false;">
+
+            <label for="reporter">Your Name</label>
+            <input type="text" id="reporter" placeholder="Enter your name" required>
+
+            <label for="category">Waste Category</label>
+            <select id="category" required>
+                <option value="">Select a category</option>
+                <option value="Illegal Dumping">Illegal Dumping</option>
+                <option value="Overflowing Garbage Bin">Overflowing Garbage Bin</option>
+                <option value="Uncollected Waste">Uncollected Waste</option>
+                <option value="Waterway Waste">Waste in Waterways</option>
+                <option value="Improper Segregation">Improper Waste Segregation</option>
+                <option value="Other">Other</option>
+            </select>
+
+            <label for="location">Location</label>
+            <input type="text" id="location" placeholder="Search a barangay or specific location, then press Enter" required>
+
+            <label>Pin the Exact Location (click on the map or search above)</label>
+            <div id="map"></div>
+
+            <input type="hidden" id="latitude" required>
+            <input type="hidden" id="longitude" required>
+
+            <label for="imageInput">Upload a Photo (Optional)</label>
+            <input type="file" id="imageInput" accept="image/*">
+            <img id="imagePreview" src="" alt="Image Preview">
+
+            <label for="description">Description</label>
+            <textarea id="description" placeholder="Describe the problem..." required></textarea>
+
+            <button type="submit" class="btn">Submit Report</button>
+        </form>
+
+        <p id="message"></p>
+    </section>
+
+    <footer>
+        <p>© 2026 EcoBaguio | A Cleaner Baguio Through Smarter Waste Management</p>
+    </footer>
+
+    <script>
+        // ===== Get HTML elements =====
+
+        const reportForm = document.getElementById("reportForm");
+        const message = document.getElementById("message");
+        const latInput = document.getElementById("latitude");
+        const lngInput = document.getElementById("longitude");
+        const locationInput = document.getElementById("location");
+
+        // Image variables
+
+        const imageInput = document.getElementById("imageInput");
+        const imagePreview = document.getElementById("imagePreview");
+        let base64Image = "";
+
+        let reports = JSON.parse(localStorage.getItem("ecoReports")) || [];
+
+        // ===== Handle Image Preview & Conversion =====
+
+        imageInput.addEventListener("change", function(e) {
+            const file = e.target.files[0];
+
+            if (file) {
+                const reader = new FileReader();
+
+                reader.onload = function(event) {
+                    base64Image = event.target.result;
+                    imagePreview.src = base64Image;
+                    imagePreview.style.display = "block";
+                };
+
+                reader.readAsDataURL(file);
+            } else {
+                base64Image = "";
+                imagePreview.style.display = "none";
+            }
+        });
+
+        // ===== Initialize the map =====
+
+        const map = L.map("map").setView([16.4023, 120.5960], 13);
+
+        // CHANGED TO "liberty" FOR THE BALANCED COLORFUL STYLE
+        L.maplibreGL({
+            style: "https://tiles.openfreemap.org/styles/liberty"
+        }).addTo(map);
+
+        map.setMaxBounds([[16.30, 120.50], [16.50, 120.70]]);
+
+        let marker = null;
+
+        map.on("click", function(e) {
+            setMarker(e.latlng.lat, e.latlng.lng);
+        });
+
+        // ===== Search Location Feature =====
+
+        locationInput.addEventListener("keypress", function(e) {
+            if (e.key === "Enter") {
+                e.preventDefault();
+                searchLocation(locationInput.value);
+            }
+        });
+
+        function searchLocation(query) {
+            if (!query.trim()) return;
+
+            const searchUrl = `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query + ", Baguio")}&limit=1`;
+
+            fetch(searchUrl)
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.length > 0) {
+                        const lat = parseFloat(data[0].lat);
+                        const lon = parseFloat(data[0].lon);
+
+                        map.setView([lat, lon], 16);
+                        setMarker(lat, lon);
+                    } else {
+                        alert("Location not found. Try being more specific (e.g., Burnham Park).");
+                    }
+                })
+                .catch(err => console.error("Search error:", err));
+        }
+
+        // ===== Map Marker & Geocode =====
+
+        function setMarker(lat, lng) {
+            const latlng = [lat, lng];
+
+            if (marker) {
+                marker.setLatLng(latlng);
+            } else {
+                marker = L.marker(latlng, { draggable: true }).addTo(map);
+
+                marker.on("dragend", function() {
+                    const pos = marker.getLatLng();
+
+                    latInput.value = pos.lat;
+                    lngInput.value = pos.lng;
+
+                    reverseGeocode(pos.lat, pos.lng);
+                });
+            }
+
+            latInput.value = lat;
+            lngInput.value = lng;
+
+            reverseGeocode(lat, lng);
+        }
+
+        function reverseGeocode(lat, lng) {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+
+            fetch(url, {
+                headers: {
+                    "Accept-Language": "en"
+                }
+            })
+                .then(res => res.json())
+                .then(data => {
+                    if (data && data.display_name && !locationInput.value.trim()) {
+                        locationInput.value = data.display_name;
+                    }
+                })
+                .catch(err => console.warn("Reverse geocoding failed:", err));
+        }
+
+        // ===== Submit Report =====
+
+        reportForm.addEventListener("submit", function(event) {
+            event.preventDefault();
+
+            if (!latInput.value || !lngInput.value) {
+                message.textContent = "Please select or search for a location on the map.";
+                message.style.color = "red";
+                return;
+            }
+
+            const report = {
+                id: Date.now(),
+                name: document.getElementById("reporter").value,
+                category: document.getElementById("category").value,
+                location: locationInput.value,
+                description: document.getElementById("description").value,
+                latitude: latInput.value,
+                longitude: lngInput.value,
+                image: base64Image,
+                status: "Pending",
+                date: new Date().toLocaleString(),
+                timestamp: Date.now()
+            };
+
+            reports.push(report);
+
+            try {
+                localStorage.setItem("ecoReports", JSON.stringify(reports));
+
+                message.textContent = "✅ Your report has been submitted successfully!";
+                message.style.color = "green";
+
+                // Reset form and image
+
+                reportForm.reset();
+                base64Image = "";
+                imagePreview.style.display = "none";
+
+                // Remove map marker
+
+                if (marker) {
+                    map.removeLayer(marker);
+                    marker = null;
+                }
+
+                map.setView([16.4023, 120.5960], 13);
+
+                latInput.value = "";
+                lngInput.value = "";
+
+            } catch (error) {
+                message.textContent = "❌ Error: Image is too large or storage is full. Please try a smaller image.";
+                message.style.color = "red";
+            }
+        });
+    </script>
+
+</body>
+</html>

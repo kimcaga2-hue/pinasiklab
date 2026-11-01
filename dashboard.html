@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>EcoBaguio | Community Dashboard</title>
+
+    <!-- Leaflet -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+    <!-- OpenFreeMap (MapLibre) -->
+    <link href="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.css" rel="stylesheet" />
+    <script src="https://unpkg.com/maplibre-gl@4.7.1/dist/maplibre-gl.js"></script>
+    <script src="https://unpkg.com/@maplibre/maplibre-gl-leaflet@0.0.20/leaflet-maplibre-gl.js"></script>
+
+    <style>
+        
+/* =====================================
+   ECOBAGUIO - COMMUNITY DASHBOARD
+===================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+    --primary: #166534;
+    --primary-dark: #14532d;
+    --primary-light: #dcfce7;
+    --background: #f5f8f5;
+    --surface: #ffffff;
+    --text: #1e293b;
+    --muted: #64748b;
+    --border: #e5e7eb;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+    scroll-behavior: smooth;
+}
+
+body {
+    background: var(--background);
+    color: var(--text);
+    line-height: 1.6;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+/* NAVIGATION */
+
+.navbar {
+    background: #14532d;
+    color: #14532d;
+    min-height: 75px;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 10%;
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.06);
+}
+
+.navbar h2 {
+    font-size: 27px;
+    color: #d8e2dc;
+}
+
+.navbar ul {
+    display: flex;
+    align-items: center;
+    list-style: none;
+    gap: 35px;
+}
+
+.navbar a {
+    color: #d8e2dc;
+    text-decoration: none;
+    font-size: 20px;
+    font-weight: bold;
+    transition: 0.3s ease;
+}
+
+.navbar a:hover {
+    color: #16a34a;
+}
+
+/* DASHBOARD */
+
+.dashboard {
+    padding: 55px 8%;
+    flex: 1;
+    width: 100%;
+    max-width: 1500px;
+    margin: auto;
+    animation: fadeUp .7s ease both;
+}
+
+.dashboard > h2 {
+    margin-top: 100px;
+    font-size: 32px;
+    font-weight: 800;
+    color: var(--primary-dark);
+    letter-spacing: -1px;
+    margin-bottom: 5px;
+}
+
+.dashboard > p {
+    color: var(--muted);
+    font-size: 20px;
+    margin-bottom: 30px;
+}
+
+/* STATISTICS */
+
+.stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 22px;
+    margin: 30px 0 40px;
+}
+
+.stat-card {
+    background: white;
+    padding: 26px;
+    border-radius: 16px;
+    box-shadow: 0 8px 30px rgba(15,60,30,.06);
+    border: 1px solid #edf2ed;
+    border-left: 5px solid var(--primary);
+    transition: .3s;
+    animation: cardEnter .7s ease both;
+}
+
+.stat-card:nth-child(2) {
+    border-left-color: #f59e0b;
+    animation-delay: .15s;
+}
+
+.stat-card:nth-child(3) {
+    border-left-color: #10b981;
+    animation-delay: .3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-7px);
+    box-shadow: 0 15px 35px rgba(15,60,30,.12);
+}
+
+.stat-card h3 {
+    color: var(--primary-dark);
+    font-size: 36px;
+    font-weight: 800;
+    margin-bottom: 4px;
+}
+
+.stat-card p {
+    color: var(--muted);
+    font-size: 25px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .8px;
+}
+
+/* REPORT LIST */
+
+.report-list {
+    max-width: 950px;
+    margin: auto;
+    text-align: left;
+}
+
+.report-item {
+    background: white;
+    padding: 25px;
+    margin: 20px 0;
+    border: 1px solid #edf2ed;
+    border-left: 5px solid var(--primary);
+    border-radius: 15px;
+    box-shadow: 0 5px 20px rgba(15,60,30,.05);
+    transition: .3s;
+    animation: reportEnter .5s ease both;
+}
+
+.report-item:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(15,60,30,.10);
+}
+
+.report-item h3 {
+    color: var(--primary-dark);
+    font-size: 25px;
+    font-weight: 800;
+    margin-bottom: 15px;
+}
+
+.report-item p {
+    color: #475569;
+    font-size: 20px;
+    margin-bottom: 9px;
+    line-height: 1.7;
+}
+
+/* STATUS */
+
+.status {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    padding: 7px 13px;
+    margin-top: 12px;
+    background: #fef3c7;
+    color: #92400e;
+    border-radius: 30px;
+    font-size: 11px;
+    font-weight: 700;
+}
+
+.status::before {
+    content: '';
+    width: 7px;
+    height: 7px;
+    background: #f59e0b;
+    border-radius: 50%;
+}
+
+.status.resolved {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status.resolved::before {
+    background: #10b981;
+}
+
+/* MINI MAPS */
+
+.report-map {
+    height: 230px;
+    width: 100%;
+    margin-top: 20px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    z-index: 1;
+    transition: .3s;
+}
+
+.report-map:hover {
+    box-shadow: 0 8px 20px rgba(0,0,0,.1);
+}
+
+/* EMPTY STATE */
+
+.report-list > p {
+    background: white;
+    padding: 45px 20px;
+    border-radius: 15px;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    text-align: center;
+}
+
+/* FOOTER */
+
+footer {
+    background: #14532d;
+    color: white;
+    padding: 22px;
+    text-align: center;
+    margin-top: auto;
+    font-size: 13px;
+}
+
+/* ANIMATIONS */
+
+@keyframes fadeUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes cardEnter {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes reportEnter {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* RESPONSIVE */
+
+@media(max-width: 850px) {
+    .dashboard {
+        padding: 40px 5%;
+    }
+
+    .stats {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+@media(max-width: 600px) {
+    .navbar {
+        flex-direction: column;
+        text-align: center;
+        padding: 18px 4%;
+    }
+
+    .navbar ul {
+        justify-content: center;
+        gap: 15px;
+    }
+
+    .dashboard {
+        padding: 35px 5%;
+    }
+
+    .dashboard > h2 {
+        font-size: 25px;
+    }
+
+    .stats {
+        grid-template-columns: 1fr;
+        gap: 15px;
+    }
+
+    .stat-card {
+        padding: 21px;
+    }
+
+    .report-item {
+        padding: 20px;
+    }
+
+    .report-map {
+        height: 190px;
+    }
+}
+
+/* REDUCED MOTION */
+
+@media(prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+    }
+}
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <nav class="navbar">
+            <h2>🌱 EcoBaguio</h2>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="report.html">Report Waste</a></li>
+                <li><a href="dashboard.html">Dashboard</a></li>
+                <li><a href="admin.html">Admin</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <section class="dashboard">
+        <h2>Community Reports</h2>
+        <p>All waste reports submitted in Baguio City.</p>
+
+        <div class="stats">
+            <div class="stat-card">
+                <h3 id="totalReports">0</h3>
+                <p>Total Reports</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="pendingReports">0</h3>
+                <p>Pending Reports</p>
+            </div>
+            <div class="stat-card">
+                <h3 id="resolvedReports">0</h3>
+                <p>Resolved Reports</p>
+            </div>
+        </div>
+
+        <div class="report-list" id="reportList">
+            <!-- Reports will load here -->
+        </div>
+    </section>
+
+    <footer>
+        <p>© 2026 EcoBaguio | A Cleaner Baguio Through Smarter Waste Management</p>
+    </footer>
+
+    <script>
+        // ===== Get HTML elements =====
+        const reportList = document.getElementById("reportList");
+        
+        // Load saved reports from browser storage
+        let reports = JSON.parse(localStorage.getItem("ecoReports")) || [];
+
+        // ===== Display submitted reports =====
+        function displayReports() {
+            reportList.innerHTML = "";
+            reports = JSON.parse(localStorage.getItem("ecoReports")) || []; // Refresh data
+
+            if (reports.length === 0) {
+                reportList.innerHTML = "<p style='text-align:center;'>No reports yet. Be the first to report!</p>";
+                updateStatistics();
+                return;
+            }
+
+            // Sort newest first
+            const sortedReports = [...reports].sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
+
+            sortedReports.forEach(function (report) {
+                const reportElement = document.createElement("div");
+                reportElement.classList.add("report-item");
+
+                const title = document.createElement("h3");
+                title.textContent = report.category;
+
+                const name = document.createElement("p");
+                name.textContent = "Reported by: " + report.name;
+
+                const location = document.createElement("p");
+                location.textContent = "Location: " + report.location;
+
+                const description = document.createElement("p");
+                description.textContent = "Description: " + report.description;
+
+                const date = document.createElement("p");
+                date.textContent = "Date: " + report.date;
+
+                const status = document.createElement("span");
+                status.classList.add("status");
+
+if (report.status === "Resolved") {
+    status.classList.add("resolved");
+}
+                status.textContent = "Status: " + report.status;
+
+                reportElement.appendChild(title);
+                reportElement.appendChild(name);
+                reportElement.appendChild(location);
+                reportElement.appendChild(description);
+                reportElement.appendChild(date);
+                reportElement.appendChild(status);
+
+                // Add a mini-map if coordinates exist
+                if (report.latitude && report.longitude) {
+                    const mapDiv = document.createElement("div");
+                    mapDiv.classList.add("report-map");
+                    reportElement.appendChild(mapDiv);
+
+                    setTimeout(() => {
+                        const miniMap = L.map(mapDiv, {
+                            scrollWheelZoom: false,
+                            dragging: false,
+                            zoomControl: false
+                        }).setView([report.latitude, report.longitude], 16);
+
+                        L.maplibreGL({
+                            style: "https://tiles.openfreemap.org/styles/liberty"
+                        }).addTo(miniMap);
+
+                        L.marker([report.latitude, report.longitude]).addTo(miniMap);
+                    }, 0);
+                }
+
+                reportList.appendChild(reportElement);
+            });
+
+            updateStatistics();
+        }
+
+        // ===== Update dashboard statistics =====
+        function updateStatistics() {
+            const total = reports.length;
+            const pending = reports.filter(r => r.status === "Pending").length;
+            const resolved = reports.filter(r => r.status === "Resolved").length;
+
+            document.getElementById("totalReports").textContent = total;
+            document.getElementById("pendingReports").textContent = pending;
+            document.getElementById("resolvedReports").textContent = resolved;
+        }
+
+        // ===== Live Update (If Admin changes a status) =====
+        window.addEventListener("storage", function (e) {
+            if (e.key === "ecoReports") {
+                displayReports();
+            }
+        });
+
+        // Initial load
+        displayReports();
+    </script>
+</body>
+</html>
